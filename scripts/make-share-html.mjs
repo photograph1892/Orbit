@@ -21,7 +21,7 @@ html = html.replace(/<script type="module"[^>]*src="([^"]+)"[^>]*><\/script>/g, 
   return "";
 });
 
-html = html.replace("</body>", `${inlineScripts.join("\n")}\n  </body>`);
+html = html.replace("</body>", () => `${inlineScripts.join("\n")}\n  </body>`);
 
 const rootSharePath = "Orbit-share.html";
 const distSharePath = path.join(distDir, "Orbit-share.html");
