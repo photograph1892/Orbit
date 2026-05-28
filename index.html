@@ -60,7 +60,11 @@
         place-items: center;
         overflow: hidden;
         background: #000;
-        animation: bootExit 11.6s ease forwards;
+        animation: bootExit 15s ease forwards;
+      }
+
+      .boot-overlay.skipping {
+        animation: bootSkip 0.42s ease forwards;
       }
 
       .boot-overlay.hidden {
@@ -84,7 +88,7 @@
         z-index: 1;
         width: min(64vw, 560px);
         transform-origin: 50% 50%;
-        animation: bootLogoDisc 8.8s cubic-bezier(0.16, 0.78, 0.22, 1) forwards;
+        animation: bootLogoDisc 12s cubic-bezier(0.16, 0.78, 0.22, 1) forwards;
       }
 
       .boot-logo::after {
@@ -95,7 +99,7 @@
         background: #f1eee8;
         mask: url("./public/orbit-logo-full.png") center / contain no-repeat;
         -webkit-mask: url("./public/orbit-logo-full.png") center / contain no-repeat;
-        animation: bootSolidOverlay 8.8s ease forwards;
+        animation: bootSolidOverlay 12s ease forwards;
       }
 
       .boot-logo img {
@@ -103,7 +107,32 @@
         width: 100%;
         height: auto;
         object-fit: contain;
-        animation: bootLogoImage 8.8s ease forwards;
+        animation: bootLogoImage 12s ease forwards;
+      }
+
+      .boot-skip {
+        position: absolute;
+        left: 50%;
+        bottom: clamp(22px, 5vh, 46px);
+        z-index: 2;
+        min-width: 58px;
+        height: 30px;
+        padding: 0 14px;
+        color: rgba(241, 238, 232, 0.68);
+        font-size: 0.72rem;
+        letter-spacing: 0;
+        border: 1px solid rgba(241, 238, 232, 0.18);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.045);
+        transform: translateX(-50%);
+        backdrop-filter: blur(12px);
+        transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+      }
+
+      .boot-skip:hover {
+        color: #f1eee8;
+        border-color: rgba(241, 238, 232, 0.44);
+        background: rgba(255, 255, 255, 0.09);
       }
 
       .boot-flash {
@@ -113,7 +142,7 @@
         background:
           radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12), transparent 28rem);
         opacity: 0;
-        animation: bootFlash 11.6s ease forwards;
+        animation: bootFlash 15s ease forwards;
       }
 
       .site-shell {
@@ -544,27 +573,27 @@
           transform: rotate(0deg) scale(1);
           filter: blur(0);
         }
-        68% {
+        70% {
           opacity: 1;
-          transform: rotate(720deg) scale(1.01);
+          transform: rotate(-720deg) scale(1.01);
           filter: blur(0);
         }
-        78%,
-        90% {
+        78% {
           opacity: 1;
-          transform: rotate(720deg) scale(1);
+          transform: rotate(-720deg) scale(1);
           filter: blur(0);
         }
+        92%,
         100% {
           opacity: 1;
-          transform: rotate(720deg) scale(0.985);
+          transform: rotate(-720deg) scale(0.88);
           filter: blur(0);
         }
       }
 
       @keyframes bootLogoImage {
         0%,
-        76% {
+        78% {
           opacity: 1;
         }
         100% {
@@ -574,7 +603,7 @@
 
       @keyframes bootSolidOverlay {
         0%,
-        76% {
+        78% {
           opacity: 0;
         }
         100% {
@@ -584,10 +613,10 @@
 
       @keyframes bootFlash {
         0%,
-        84% {
+        86% {
           opacity: 0;
         }
-        91% {
+        93% {
           opacity: 1;
         }
         100% {
@@ -614,6 +643,13 @@
           visibility: visible;
         }
         100% {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+
+      @keyframes bootSkip {
+        to {
           opacity: 0;
           visibility: hidden;
         }
@@ -651,6 +687,7 @@
         <img src="./public/orbit-logo-full.png" alt="" />
       </div>
       <div class="boot-flash"></div>
+      <button class="boot-skip" type="button" id="boot-skip">skip</button>
     </div>
 
     <main class="site-shell" style="--accent: #d9a36b">
@@ -750,9 +787,16 @@
 
     <script>
       const bootOverlay = document.getElementById("boot-overlay");
-      window.setTimeout(() => {
+      const bootSkip = document.getElementById("boot-skip");
+      const finishBoot = () => {
         bootOverlay?.classList.add("hidden");
-      }, 11800);
+      };
+      const bootTimer = window.setTimeout(finishBoot, 15200);
+      bootSkip?.addEventListener("click", () => {
+        window.clearTimeout(bootTimer);
+        bootOverlay?.classList.add("skipping");
+        window.setTimeout(finishBoot, 420);
+      });
 
       const moods = {
         warm: {
