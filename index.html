@@ -60,7 +60,7 @@
         place-items: center;
         overflow: hidden;
         background: #000;
-        animation: bootExit 8.4s ease forwards;
+        animation: bootExit 11.6s ease forwards;
       }
 
       .boot-overlay.hidden {
@@ -82,9 +82,9 @@
       .boot-logo {
         position: relative;
         z-index: 1;
-        width: min(78vw, 680px);
+        width: min(64vw, 560px);
         transform-origin: 50% 50%;
-        animation: bootLogoDisc 6.1s cubic-bezier(0.18, 0.82, 0.24, 1) forwards;
+        animation: bootLogoDisc 8.8s cubic-bezier(0.16, 0.78, 0.22, 1) forwards;
       }
 
       .boot-logo::after {
@@ -95,7 +95,7 @@
         background: #f1eee8;
         mask: url("./public/orbit-logo-full.png") center / contain no-repeat;
         -webkit-mask: url("./public/orbit-logo-full.png") center / contain no-repeat;
-        animation: bootSolidOverlay 6.1s ease forwards;
+        animation: bootSolidOverlay 8.8s ease forwards;
       }
 
       .boot-logo img {
@@ -103,7 +103,7 @@
         width: 100%;
         height: auto;
         object-fit: contain;
-        animation: bootLogoImage 6.1s ease forwards;
+        animation: bootLogoImage 8.8s ease forwards;
       }
 
       .boot-flash {
@@ -113,7 +113,7 @@
         background:
           radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12), transparent 28rem);
         opacity: 0;
-        animation: bootFlash 8.4s ease forwards;
+        animation: bootFlash 11.6s ease forwards;
       }
 
       .site-shell {
@@ -539,32 +539,32 @@
           transform: rotate(0deg) scale(0.94);
           filter: blur(2px);
         }
-        10% {
+        12% {
           opacity: 1;
           transform: rotate(0deg) scale(1);
           filter: blur(0);
         }
-        54% {
+        68% {
           opacity: 1;
-          transform: rotate(1080deg) scale(1.015);
+          transform: rotate(720deg) scale(1.01);
           filter: blur(0);
         }
-        64%,
-        82% {
+        78%,
+        90% {
           opacity: 1;
-          transform: rotate(1080deg) scale(1);
+          transform: rotate(720deg) scale(1);
           filter: blur(0);
         }
         100% {
           opacity: 1;
-          transform: rotate(1080deg) scale(0.985);
+          transform: rotate(720deg) scale(0.985);
           filter: blur(0);
         }
       }
 
       @keyframes bootLogoImage {
         0%,
-        72% {
+        76% {
           opacity: 1;
         }
         100% {
@@ -574,7 +574,7 @@
 
       @keyframes bootSolidOverlay {
         0%,
-        72% {
+        76% {
           opacity: 0;
         }
         100% {
@@ -584,10 +584,10 @@
 
       @keyframes bootFlash {
         0%,
-        76% {
+        84% {
           opacity: 0;
         }
-        86% {
+        91% {
           opacity: 1;
         }
         100% {
@@ -609,7 +609,7 @@
 
       @keyframes bootExit {
         0%,
-        86% {
+        90% {
           opacity: 1;
           visibility: visible;
         }
@@ -640,7 +640,7 @@
         }
 
         .boot-logo {
-          width: min(92vw, 620px);
+          width: min(82vw, 500px);
         }
       }
     </style>
@@ -752,7 +752,7 @@
       const bootOverlay = document.getElementById("boot-overlay");
       window.setTimeout(() => {
         bootOverlay?.classList.add("hidden");
-      }, 8600);
+      }, 11800);
 
       const moods = {
         warm: {
