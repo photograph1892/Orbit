@@ -5,6 +5,7 @@ const USER_KEY = "orbit.user.v1";
 const PLAYLIST_KEY = "orbit.playlists.v1";
 const TRACK_DURATION = 30;
 const DEVICE_IMAGE_SRC = `${import.meta.env.BASE_URL}orbit-device.png`;
+const FRONT_FRAME_SRC = `${import.meta.env.BASE_URL}orbit-front-frame.png`;
 
 const moods = [
   { id: "calm", label: "평온한", colorName: "Pale Blue", color: "#b9d7eb", title: "Slow Lake", tone: "calm ambient", notes: [196, 247, 294] },
@@ -405,15 +406,15 @@ function App() {
   return (
     !user ? (
       <main className="app-shell" style={{ "--accent": accent }}>
-        <div className="phone-stage">
+        <ProductFrame>
           <section className="screen login-screen">
             <Login onLogin={login} />
           </section>
-        </div>
+        </ProductFrame>
       </main>
     ) : (
     <main className="app-shell" style={{ "--accent": accent }}>
-      <div className="phone-stage">
+      <ProductFrame nav={<BottomNav active={screen} onNavigate={navTo} />}>
         <section className={`screen ${screen}`}>
           {screen === "intro" && <Intro onStart={startRecordFlow} records={shelfRecords} onOpen={openRecord} user={user} onLogout={logout} />}
           {screen === "capture" && <Capture photo={photo} onPhoto={handlePhoto} onNext={() => setScreen("sound")} />}
@@ -468,10 +469,21 @@ function App() {
             />
           )}
         </section>
-        <BottomNav active={screen} onNavigate={navTo} />
-      </div>
+      </ProductFrame>
     </main>
     )
+  );
+}
+
+function ProductFrame({ children, nav }) {
+  return (
+    <div className="product-stage">
+      <div className="device-window">
+        {children}
+      </div>
+      <img className="product-frame" src={FRONT_FRAME_SRC} alt="Orbit front device frame" />
+      {nav}
+    </div>
   );
 }
 

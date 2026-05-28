@@ -15,8 +15,12 @@ html = html.replace(/<script type="module"[^>]*src="([^"]+)"[^>]*><\/script>/g, 
   const jsPath = path.join(distDir, src.replace(/^\.?\//, ""));
   let js = fs.readFileSync(jsPath, "utf8");
   const deviceImage = `data:image/png;base64,${fs.readFileSync(path.join("public", "orbit-device.png")).toString("base64")}`;
+  const frontFrameImage = `data:image/png;base64,${fs.readFileSync(path.join("public", "orbit-front-frame.png")).toString("base64")}`;
   js = js.replaceAll("/Orbit/orbit-device.png", deviceImage);
   js = js.replaceAll("/orbit-device.png", deviceImage);
+  js = js.replaceAll("/Orbit/orbit-front-frame.png", frontFrameImage);
+  js = js.replaceAll("/orbit-front-frame.png", frontFrameImage);
+  js = js.replaceAll("./orbit-front-frame.png", frontFrameImage);
   inlineScripts.push(`<script>${js}</script>`);
   return "";
 });

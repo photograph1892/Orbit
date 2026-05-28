@@ -3,25 +3,767 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#080808" />
+    <meta name="theme-color" content="#090807" />
     <meta
       name="description"
-      content="Orbit - AI BGM memory device app prototype"
+      content="Orbit - AI BGM memory device prototype"
     />
-    <link rel="manifest" href="./manifest.json" />
-    <link rel="icon" href="./orbit-icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="./public/manifest.json" />
+    <link rel="icon" href="./public/orbit-icon.svg" type="image/svg+xml" />
     <title>Orbit</title>
-    <script>
-      const target = new URL("./Orbit-share.html", window.location.href);
-      target.search = window.location.search;
-      target.hash = window.location.hash;
-      window.location.replace(target);
-    </script>
+    <style>
+      :root {
+        color: #f7f1e8;
+        background: #090807;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        font-synthesis: none;
+        text-rendering: geometricPrecision;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        overflow-x: hidden;
+        background:
+          radial-gradient(circle at 50% 40%, rgba(255, 247, 232, 0.2), transparent 27rem),
+          radial-gradient(circle at 80% 12%, rgba(126, 130, 190, 0.16), transparent 22rem),
+          linear-gradient(180deg, #171311 0%, #080706 62%, #020202 100%);
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .site-shell {
+        width: 100%;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: clamp(18px, 4vw, 46px) 0 72px;
+      }
+
+      .product-stage {
+        position: relative;
+        width: clamp(760px, 92vw, 1120px);
+        aspect-ratio: 1448 / 1086;
+        filter: drop-shadow(0 34px 72px rgba(0, 0, 0, 0.52));
+      }
+
+      .device-screen {
+        position: absolute;
+        z-index: 1;
+        left: 27.9%;
+        top: 19.7%;
+        width: 44.2%;
+        aspect-ratio: 1;
+        overflow: hidden;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 50% 14%, color-mix(in srgb, var(--accent, #d9a36b), transparent 56%), transparent 42%),
+          linear-gradient(180deg, #171318 0%, #08080b 68%, #030304 100%);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+          inset 0 24px 48px rgba(255, 255, 255, 0.06),
+          inset 0 -34px 58px rgba(0, 0, 0, 0.58);
+      }
+
+      .device-screen::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        pointer-events: none;
+        border-radius: 50%;
+        box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.58);
+      }
+
+      .screen-page {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 14px;
+        padding: clamp(24px, 3vw, 38px);
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+        transition: opacity 0.28s ease, transform 0.28s ease;
+      }
+
+      .screen-page.active {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+
+      .screen-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        color: rgba(247, 241, 232, 0.62);
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      .brand-mark {
+        color: #dca166;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      .home-copy,
+      .capture-copy,
+      .library-copy {
+        align-self: center;
+        display: grid;
+        gap: 12px;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: clamp(2.7rem, 6vw, 4rem);
+        line-height: 0.86;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        font-size: clamp(1.25rem, 3vw, 1.75rem);
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .screen-page p {
+        color: rgba(247, 241, 232, 0.66);
+        font-size: 0.8rem;
+        line-height: 1.55;
+        word-break: keep-all;
+      }
+
+      .orbital-disc {
+        position: relative;
+        width: min(58%, 190px);
+        aspect-ratio: 1;
+        justify-self: center;
+        align-self: center;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background:
+          repeating-radial-gradient(circle, #030303 0 5px, #111116 6px 8px),
+          #050505;
+        box-shadow:
+          0 20px 44px rgba(0, 0, 0, 0.44),
+          0 0 42px color-mix(in srgb, var(--accent, #d9a36b), transparent 50%);
+      }
+
+      .orbital-disc.playing {
+        animation: spin 8s linear infinite;
+      }
+
+      .disc-label {
+        width: 38%;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        border-radius: 50%;
+        background: var(--accent, #d9a36b);
+      }
+
+      .disc-label img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .disc-label span {
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 0.72rem;
+        font-weight: 900;
+      }
+
+      .action-row,
+      .mood-grid,
+      .transport-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .primary,
+      .secondary,
+      .icon-button,
+      .mood-button {
+        color: #101010;
+        border-radius: 999px;
+        transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+      }
+
+      .primary {
+        min-height: 44px;
+        padding: 0 18px;
+        background: linear-gradient(145deg, #fff7ea, #cab7a2);
+        box-shadow: 0 16px 34px rgba(216, 150, 88, 0.18);
+      }
+
+      .secondary,
+      .mood-button,
+      .icon-button {
+        color: #f7f1e8;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .secondary {
+        min-height: 42px;
+        padding: 0 16px;
+      }
+
+      .primary:hover,
+      .secondary:hover,
+      .mood-button:hover,
+      .icon-button:hover {
+        transform: translateY(-2px);
+      }
+
+      .mood-grid {
+        align-self: center;
+        gap: 8px;
+      }
+
+      .mood-button {
+        min-height: 38px;
+        padding: 0 13px;
+        font-size: 0.78rem;
+      }
+
+      .mood-button.active {
+        color: #111;
+        background: var(--mood);
+      }
+
+      .capture-orbit {
+        position: relative;
+        width: min(56%, 180px);
+        aspect-ratio: 1;
+        justify-self: center;
+        align-self: center;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12), transparent 42%),
+          linear-gradient(145deg, #232028, #09090c);
+        box-shadow: 0 22px 42px rgba(0, 0, 0, 0.36);
+      }
+
+      .capture-orbit img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .capture-orbit span {
+        color: rgba(247, 241, 232, 0.62);
+        font-size: 0.76rem;
+      }
+
+      .capture-orbit::before,
+      .capture-orbit::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .capture-orbit::before {
+        inset: 8%;
+        border: 1px solid color-mix(in srgb, var(--accent, #d9a36b), transparent 42%);
+      }
+
+      .capture-orbit::after {
+        inset: 28%;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .file-control {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .file-control input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .library-list {
+        display: grid;
+        gap: 8px;
+        align-self: center;
+      }
+
+      .track-button {
+        min-height: 48px;
+        display: grid;
+        grid-template-columns: 32px 1fr;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        color: #f7f1e8;
+        text-align: left;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .track-dot {
+        width: 28px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: var(--track-color);
+      }
+
+      .track-button b {
+        display: block;
+        overflow: hidden;
+        font-size: 0.82rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .track-button small {
+        color: rgba(247, 241, 232, 0.58);
+        font-size: 0.68rem;
+      }
+
+      .icon-button {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+      }
+
+      .progress {
+        width: min(78%, 230px);
+        height: 4px;
+        justify-self: center;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .progress i {
+        display: block;
+        width: var(--progress, 18%);
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #fff8eb, var(--accent, #d9a36b));
+      }
+
+      .device-frame {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .hit-zone {
+        position: absolute;
+        z-index: 5;
+        background: transparent;
+        border-radius: 50%;
+      }
+
+      .hit-plus {
+        left: 47%;
+        top: 7.5%;
+        width: 6%;
+        height: 8%;
+      }
+
+      .hit-minus {
+        left: 46.5%;
+        top: 84.5%;
+        width: 7%;
+        height: 6%;
+      }
+
+      .hit-prev {
+        left: 18.5%;
+        top: 46%;
+        width: 8%;
+        height: 9%;
+      }
+
+      .hit-next {
+        left: 73.5%;
+        top: 46%;
+        width: 8%;
+        height: 9%;
+      }
+
+      .status-pill {
+        position: absolute;
+        left: 50%;
+        bottom: -54px;
+        transform: translateX(-50%);
+        z-index: 6;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 40px;
+        padding: 0 16px;
+        color: rgba(247, 241, 232, 0.74);
+        font-size: 0.76rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        background: rgba(18, 16, 15, 0.82);
+        backdrop-filter: blur(18px);
+      }
+
+      .status-light {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent, #d9a36b);
+        box-shadow: 0 0 16px var(--accent, #d9a36b);
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 760px) {
+        .site-shell {
+          overflow: hidden;
+          padding-top: 32px;
+        }
+
+        .product-stage {
+          width: 760px;
+          max-width: none;
+        }
+
+        .screen-page {
+          padding: 24px;
+        }
+
+        .status-pill {
+          width: min(360px, calc(100vw - 28px));
+          justify-content: center;
+        }
+      }
+    </style>
   </head>
   <body>
-    <p>
-      Orbit is loading.
-      <a href="./Orbit-share.html">Open Orbit</a>
-    </p>
+    <main class="site-shell" style="--accent: #d9a36b">
+      <section class="product-stage" aria-label="Orbit product prototype">
+        <div class="device-screen">
+          <article class="screen-page active" data-page="home">
+            <div class="screen-top">
+              <span class="brand-mark">Orbit</span>
+              <span id="mood-name">Warm Beige</span>
+            </div>
+            <div class="home-copy">
+              <h1>Orbit</h1>
+              <p>사진, 소리, 기분을 하나의 AI BGM으로 저장하는 개인 음악 기억 장치</p>
+            </div>
+            <div class="action-row">
+              <button class="primary" type="button" data-go="capture">오늘 기록</button>
+              <button class="secondary" type="button" data-go="library">LP 보기</button>
+            </div>
+          </article>
+
+          <article class="screen-page" data-page="capture">
+            <div class="screen-top">
+              <span class="brand-mark">Capture</span>
+              <span>AI BGM</span>
+            </div>
+            <div class="capture-orbit">
+              <img id="photo-preview" alt="" hidden />
+              <span id="photo-placeholder">Memory input</span>
+            </div>
+            <div class="mood-grid" aria-label="Mood">
+              <button class="mood-button active" style="--mood: #d9a36b" type="button" data-mood="warm">따뜻한</button>
+              <button class="mood-button" style="--mood: #9bbdd6" type="button" data-mood="calm">평온한</button>
+              <button class="mood-button" style="--mood: #8f91d6" type="button" data-mood="dreamy">몽환적</button>
+            </div>
+            <div class="action-row">
+              <label class="secondary file-control">
+                사진 선택
+                <input id="photo-input" type="file" accept="image/*" />
+              </label>
+              <button class="primary" type="button" id="generate">생성</button>
+            </div>
+          </article>
+
+          <article class="screen-page" data-page="play">
+            <div class="screen-top">
+              <span class="brand-mark">Now Playing</span>
+              <span id="track-date">2026.05.29</span>
+            </div>
+            <div class="orbital-disc" id="disc">
+              <div class="disc-label">
+                <img id="disc-photo" alt="" hidden />
+                <span id="disc-mark">AI</span>
+              </div>
+            </div>
+            <div class="library-copy">
+              <h2 id="track-title">Warm Afternoon</h2>
+              <p id="track-subtitle">soft acoustic · personal LP</p>
+            </div>
+            <div class="progress"><i id="progress-bar"></i></div>
+            <div class="transport-row">
+              <button class="icon-button" type="button" data-prev aria-label="Previous">◀</button>
+              <button class="primary" type="button" id="play-toggle">Play</button>
+              <button class="icon-button" type="button" data-next aria-label="Next">▶</button>
+            </div>
+          </article>
+
+          <article class="screen-page" data-page="library">
+            <div class="screen-top">
+              <span class="brand-mark">Archive</span>
+              <span id="track-count">3 LP</span>
+            </div>
+            <div class="library-list" id="library-list"></div>
+            <div class="action-row">
+              <button class="secondary" type="button" data-go="home">Home</button>
+              <button class="primary" type="button" data-go="capture">새 기록</button>
+            </div>
+          </article>
+        </div>
+
+        <img
+          class="device-frame"
+          src="./public/orbit-front-frame.png"
+          alt="Orbit front view product frame"
+        />
+
+        <button class="hit-zone hit-plus" type="button" data-go="capture" aria-label="Record"></button>
+        <button class="hit-zone hit-minus" type="button" data-go="library" aria-label="Archive"></button>
+        <button class="hit-zone hit-prev" type="button" data-prev aria-label="Previous track"></button>
+        <button class="hit-zone hit-next" type="button" data-next aria-label="Next track"></button>
+
+        <div class="status-pill">
+          <span class="status-light"></span>
+          <span id="status-text">front view prototype online</span>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const moods = {
+        warm: {
+          label: "Warm Beige",
+          color: "#d9a36b",
+          title: "Warm Afternoon",
+          tone: "soft acoustic"
+        },
+        calm: {
+          label: "Pale Blue",
+          color: "#9bbdd6",
+          title: "Slow Lake",
+          tone: "calm ambient"
+        },
+        dreamy: {
+          label: "Violet Blue",
+          color: "#8f91d6",
+          title: "Holographic Dream",
+          tone: "dream pad"
+        }
+      };
+
+      const tracks = [
+        { title: "Warm Afternoon", mood: "warm", date: "2026.05.29" },
+        { title: "Slow Lake", mood: "calm", date: "2026.05.28" },
+        { title: "Holographic Dream", mood: "dreamy", date: "2026.05.27" }
+      ];
+
+      const shell = document.querySelector(".site-shell");
+      const pages = Array.from(document.querySelectorAll(".screen-page"));
+      const moodButtons = Array.from(document.querySelectorAll(".mood-button"));
+      const libraryList = document.getElementById("library-list");
+      const trackCount = document.getElementById("track-count");
+      const trackTitle = document.getElementById("track-title");
+      const trackSubtitle = document.getElementById("track-subtitle");
+      const trackDate = document.getElementById("track-date");
+      const moodName = document.getElementById("mood-name");
+      const disc = document.getElementById("disc");
+      const discPhoto = document.getElementById("disc-photo");
+      const discMark = document.getElementById("disc-mark");
+      const playToggle = document.getElementById("play-toggle");
+      const progressBar = document.getElementById("progress-bar");
+      const statusText = document.getElementById("status-text");
+      const photoInput = document.getElementById("photo-input");
+      const photoPreview = document.getElementById("photo-preview");
+      const photoPlaceholder = document.getElementById("photo-placeholder");
+      const generate = document.getElementById("generate");
+
+      let currentPage = "home";
+      let currentMood = "warm";
+      let currentTrack = 0;
+      let playing = false;
+      let photoData = "";
+      let progress = 18;
+
+      function setPage(page) {
+        currentPage = page;
+        pages.forEach((item) => {
+          item.classList.toggle("active", item.dataset.page === page);
+        });
+        statusText.textContent = page === "home" ? "front view prototype online" : `${page} mode`;
+      }
+
+      function setMood(id) {
+        currentMood = id;
+        const mood = moods[id];
+        shell.style.setProperty("--accent", mood.color);
+        moodName.textContent = mood.label;
+        moodButtons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.mood === id);
+        });
+      }
+
+      function renderTrack() {
+        const track = tracks[currentTrack];
+        const mood = moods[track.mood];
+        shell.style.setProperty("--accent", mood.color);
+        trackTitle.textContent = track.title;
+        trackSubtitle.textContent = `${mood.tone} · personal LP`;
+        trackDate.textContent = track.date;
+        moodName.textContent = mood.label;
+        progressBar.style.setProperty("--progress", `${progress}%`);
+        disc.classList.toggle("playing", playing);
+        playToggle.textContent = playing ? "Pause" : "Play";
+        if (track.photo) {
+          discPhoto.src = track.photo;
+          discPhoto.hidden = false;
+          discMark.hidden = true;
+        } else {
+          discPhoto.hidden = true;
+          discMark.hidden = false;
+        }
+      }
+
+      function renderLibrary() {
+        libraryList.replaceChildren();
+        trackCount.textContent = `${tracks.length} LP`;
+        tracks.forEach((track, index) => {
+          const mood = moods[track.mood];
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "track-button";
+          button.style.setProperty("--track-color", mood.color);
+          button.innerHTML = `
+            <span class="track-dot"></span>
+            <span><b>${track.title}</b><small>${mood.tone} · ${track.date}</small></span>
+          `;
+          button.addEventListener("click", () => {
+            currentTrack = index;
+            playing = true;
+            progress = 28;
+            renderTrack();
+            setPage("play");
+          });
+          libraryList.append(button);
+        });
+      }
+
+      function nextTrack(delta) {
+        currentTrack = (currentTrack + delta + tracks.length) % tracks.length;
+        progress = 18;
+        renderTrack();
+        setPage("play");
+      }
+
+      document.addEventListener("click", (event) => {
+        const go = event.target.closest("[data-go]");
+        if (go) setPage(go.dataset.go);
+        if (event.target.closest("[data-prev]")) nextTrack(-1);
+        if (event.target.closest("[data-next]")) nextTrack(1);
+      });
+
+      moodButtons.forEach((button) => {
+        button.addEventListener("click", () => setMood(button.dataset.mood));
+      });
+
+      photoInput.addEventListener("change", (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          photoData = String(reader.result);
+          photoPreview.src = photoData;
+          photoPreview.hidden = false;
+          photoPlaceholder.hidden = true;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      generate.addEventListener("click", () => {
+        const mood = moods[currentMood];
+        tracks.unshift({
+          title: mood.title,
+          mood: currentMood,
+          date: new Intl.DateTimeFormat("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+          }).format(new Date()).replace(/\s/g, ""),
+          photo: photoData
+        });
+        currentTrack = 0;
+        playing = true;
+        progress = 32;
+        renderLibrary();
+        renderTrack();
+        setPage("play");
+      });
+
+      playToggle.addEventListener("click", () => {
+        playing = !playing;
+        renderTrack();
+      });
+
+      setMood("warm");
+      renderLibrary();
+      renderTrack();
+    </script>
   </body>
 </html>
