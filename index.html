@@ -60,7 +60,7 @@
         place-items: center;
         overflow: hidden;
         background: #000;
-        animation: bootExit 6.2s ease forwards;
+        animation: bootExit 7.4s ease forwards;
       }
 
       .boot-overlay.hidden {
@@ -82,26 +82,29 @@
       .boot-logo {
         position: relative;
         z-index: 1;
-        width: clamp(430px, 46vw, 660px);
-        height: clamp(180px, 23vw, 280px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(16px, 1.8vw, 28px);
+        width: min(86vw, 760px);
+        height: clamp(150px, 22vw, 260px);
+        transform-origin: 50% 50%;
+        animation: bootLogoDisc 6.1s cubic-bezier(0.18, 0.82, 0.24, 1) forwards;
       }
 
       .boot-o {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: clamp(230px, 34vw, 430px);
+        position: relative;
+        flex: 0 0 auto;
+        width: clamp(118px, 14vw, 188px);
         aspect-ratio: 1;
-        transform: translate(-50%, -50%);
         filter: none;
-        animation: bootOTravel 5.1s cubic-bezier(0.2, 0.74, 0.2, 1) forwards;
+        animation: bootOSolid 6.1s ease forwards;
       }
 
       .boot-o img {
         width: 100%;
         height: 100%;
         object-fit: contain;
-        animation: bootSpin 1.2s linear infinite;
       }
 
       .boot-o::after {
@@ -114,30 +117,25 @@
           radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.36), transparent 16%),
           radial-gradient(circle at 68% 72%, rgba(188, 190, 186, 0.24), transparent 20%),
           linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.28) 48%, transparent 74%);
-        opacity: 0;
-        animation: bootShine 5.1s ease forwards, bootOrbDrift 9s ease-in-out 3.15s infinite alternate;
+        opacity: 0.42;
+        animation: bootOOverlay 6.1s ease forwards;
       }
 
       .boot-letters {
-        position: absolute;
-        left: clamp(182px, 18vw, 245px);
-        top: 50%;
-        transform: translateY(-46%) translateX(28px);
+        position: relative;
         display: flex;
         align-items: baseline;
-        opacity: 0;
-        font-size: clamp(5rem, 12.2vw, 11rem);
+        opacity: 1;
+        font-size: clamp(5rem, 12.4vw, 11rem);
         font-weight: 900;
         line-height: 0.8;
         letter-spacing: 0;
-        animation: bootLetters 5.1s cubic-bezier(0.2, 0.74, 0.2, 1) forwards;
       }
 
       .boot-letters span {
         display: inline-block;
-        opacity: 0;
+        opacity: 1;
         color: transparent;
-        transform: translateY(18px);
         background:
           radial-gradient(circle at 24% 34%, #f4f3ef 0 6%, transparent 22%),
           radial-gradient(circle at 68% 28%, #a8aaa8 0 7%, transparent 24%),
@@ -148,26 +146,7 @@
         background-clip: text;
         -webkit-background-clip: text;
         text-shadow: 0 0 24px rgba(245, 242, 232, 0.08);
-        animation:
-          bootLetterIn 1s ease var(--letter-delay, 2.15s) forwards,
-          bootGradient 8.8s ease-in-out 3.05s infinite alternate,
-          bootSolid 5.1s ease forwards;
-      }
-
-      .boot-letters span:nth-child(1) {
-        --letter-delay: 2.15s;
-      }
-
-      .boot-letters span:nth-child(2) {
-        --letter-delay: 2.27s;
-      }
-
-      .boot-letters span:nth-child(3) {
-        --letter-delay: 2.39s;
-      }
-
-      .boot-letters span:nth-child(4) {
-        --letter-delay: 2.51s;
+        animation: bootSolid 6.1s ease forwards;
       }
 
       .boot-flash {
@@ -177,7 +156,7 @@
         background:
           radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.12), transparent 28rem);
         opacity: 0;
-        animation: bootFlash 6.2s ease forwards;
+        animation: bootFlash 7.4s ease forwards;
       }
 
       .site-shell {
@@ -597,105 +576,58 @@
         }
       }
 
-      @keyframes bootSpin {
-        to {
-          transform: rotate(360deg);
+      @keyframes bootLogoDisc {
+        0% {
+          opacity: 0;
+          transform: rotate(0deg) scale(0.94);
+          filter: blur(2px);
+        }
+        10% {
+          opacity: 1;
+          transform: rotate(0deg) scale(1);
+          filter: blur(0);
+        }
+        54% {
+          opacity: 1;
+          transform: rotate(1080deg) scale(1.015);
+          filter: blur(0);
+        }
+        64%,
+        82% {
+          opacity: 1;
+          transform: rotate(1080deg) scale(1);
+          filter: blur(0);
+        }
+        100% {
+          opacity: 1;
+          transform: rotate(1080deg) scale(0.985);
+          filter: blur(0);
         }
       }
 
-      @keyframes bootOTravel {
-        0% {
-          left: 50%;
-          width: clamp(230px, 34vw, 430px);
-          transform: translate(-50%, -50%) scale(1.04);
-          filter: none;
-        }
-        38% {
-          left: 50%;
-          width: clamp(230px, 34vw, 430px);
-          transform: translate(-50%, -50%) scale(1);
-          filter: none;
-        }
-        62% {
-          left: clamp(42px, 4vw, 58px);
-          width: clamp(116px, 13vw, 190px);
-          transform: translate(0, -50%) scale(1);
-          filter: none;
-        }
-        84% {
-          left: clamp(42px, 4vw, 58px);
-          width: clamp(116px, 13vw, 190px);
-          transform: translate(0, -50%) scale(1);
+      @keyframes bootOSolid {
+        0%,
+        74% {
           filter: none;
         }
         100% {
-          left: clamp(42px, 4vw, 58px);
-          width: clamp(116px, 13vw, 190px);
-          transform: translate(0, -50%) scale(1);
           filter: brightness(0) invert(94%);
         }
       }
 
-      @keyframes bootShine {
+      @keyframes bootOOverlay {
         0%,
-        30% {
-          opacity: 0;
-          transform: translateX(-36%) rotate(0deg);
-        }
-        48%,
-        78% {
-          opacity: 0.45;
+        72% {
+          opacity: 0.42;
         }
         100% {
           opacity: 0;
-          transform: translateX(36%) rotate(45deg);
-        }
-      }
-
-      @keyframes bootOrbDrift {
-        0% {
-          background-position: 20% 24%, 72% 70%, 0 0;
-        }
-        100% {
-          background-position: 66% 38%, 38% 58%, 100% 0;
-        }
-      }
-
-      @keyframes bootLetters {
-        0%,
-        38% {
-          opacity: 0;
-          transform: translateY(-46%) translateX(28px);
-        }
-        52% {
-          opacity: 1;
-          transform: translateY(-46%) translateX(0);
-        }
-        84% {
-          opacity: 1;
-          transform: translateY(-46%) translateX(0);
-        }
-        100% {
-          opacity: 1;
-          transform: translateY(-46%) translateX(0);
-        }
-      }
-
-      @keyframes bootGradient {
-        0% {
-          background-position: 16% 48%, 74% 30%, 48% 78%, 0 0;
-        }
-        45% {
-          background-position: 54% 28%, 38% 70%, 80% 46%, 0 0;
-        }
-        100% {
-          background-position: 72% 64%, 24% 36%, 30% 30%, 0 0;
         }
       }
 
       @keyframes bootSolid {
         0%,
-        78% {
+        72% {
           background-image:
             radial-gradient(circle at 24% 34%, #f4f3ef 0 6%, transparent 22%),
             radial-gradient(circle at 68% 28%, #a8aaa8 0 7%, transparent 24%),
@@ -704,13 +636,6 @@
         }
         100% {
           background-image: linear-gradient(#f1eee8, #f1eee8);
-        }
-      }
-
-      @keyframes bootLetterIn {
-        to {
-          opacity: 1;
-          transform: translateY(0);
         }
       }
 
@@ -741,7 +666,7 @@
 
       @keyframes bootExit {
         0%,
-        82% {
+        88% {
           opacity: 1;
           visibility: visible;
         }
@@ -772,11 +697,15 @@
         }
 
         .boot-logo {
-          width: min(90vw, 480px);
+          width: min(90vw, 520px);
+          gap: 14px;
+        }
+
+        .boot-o {
+          width: clamp(92px, 23vw, 128px);
         }
 
         .boot-letters {
-          left: clamp(150px, 34vw, 172px);
           font-size: clamp(3.8rem, 16vw, 5.9rem);
         }
       }
@@ -894,7 +823,7 @@
       const bootOverlay = document.getElementById("boot-overlay");
       window.setTimeout(() => {
         bootOverlay?.classList.add("hidden");
-      }, 6400);
+      }, 7600);
 
       const moods = {
         warm: {
