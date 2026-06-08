@@ -768,20 +768,169 @@ body {
 }
 
 @media (max-width: 760px) {
+  :root {
+    --logo-width: clamp(170px, 48vw, 240px);
+  }
+
+  body {
+    min-width: 320px;
+  }
+
+  .stage::after {
+    opacity: 0.12;
+  }
+
+  .mode-switch {
+    top: max(14px, env(safe-area-inset-top));
+    left: 50%;
+    right: auto;
+    z-index: 1900;
+    gap: 4px;
+    padding: 5px;
+    transform: translateX(-50%);
+  }
+
+  .mode-button {
+    min-width: 58px;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
   .orbit-wrap {
-    top: 16vh;
-    width: 96vw;
-    height: 54vw;
+    top: 17vh;
+    width: 112vw;
+    height: min(72vw, 360px);
+    perspective: 1200px;
+  }
+
+  .stage.is-orbit-hover .orbit-wrap {
+    top: 10vh;
+    width: 118vw;
+    height: min(84vw, 430px);
+  }
+
+  .empty-orbit {
+    width: 72vw;
+    font-size: 19px;
+    line-height: 1.15;
   }
 
   .brand-logo {
-    top: 72vh;
-    left: 8vw;
-    bottom: auto;
-    width: 46vw;
+    top: auto;
+    left: 5.5vw;
+    bottom: calc(18vh + env(safe-area-inset-bottom));
+    width: var(--logo-width);
   }
 
   .album-info {
-    top: 62vh;
+    top: 55vh;
+    min-width: 70vw;
+    transform: translate(-50%, 18px) scale(0.96);
+  }
+
+  .stage.is-orbit-hover .album-info {
+    transform: translate(-50%, 3vh) scale(1);
+  }
+
+  .album-title {
+    font-size: clamp(22px, 8vw, 34px);
+  }
+
+  .album-date {
+    margin-top: 16px;
+    font-size: 14px;
+  }
+
+  .player-panel {
+    right: 4vw;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    left: 4vw;
+    grid-template-columns: 1fr;
+    gap: 9px;
+    padding: 12px;
+    border-radius: 28px;
+    corner-shape: squircle;
+  }
+
+  .now-playing {
+    margin: 0 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .transport {
+    justify-content: center;
+  }
+
+  .player-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .player-time {
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    gap: 9px;
+    width: 100%;
+  }
+
+  .mode-panel {
+    padding:
+      max(68px, calc(env(safe-area-inset-top) + 56px))
+      14px
+      max(18px, env(safe-area-inset-bottom));
+    place-items: start center;
+  }
+
+  .panel-shell,
+  .panel-shell.wide {
+    width: min(100%, 430px);
+    max-height: calc(100vh - 96px - env(safe-area-inset-bottom));
+    padding: 18px;
+    border-radius: 30px;
+  }
+
+  .capture-stage {
+    max-height: 46vh;
+  }
+
+  .capture-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .glass-button {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .month-card {
+    grid-template-columns: 64px 1fr;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 24px;
+  }
+
+  .month-cover {
+    width: 64px;
+  }
+
+  .month-card strong {
+    font-size: 18px;
+  }
+
+  .edit-item {
+    grid-template-columns: 56px 1fr;
+  }
+
+  .edit-actions {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    justify-items: stretch;
+  }
+
+  .edit-actions .quiet-button {
+    text-align: center;
   }
 }
