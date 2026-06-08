@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scroll Orbit</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <svg class="squircle-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <defs>
+        <clipPath id="squircle-clip" clipPathUnits="objectBoundingBox">
+          <path d="M 0.18 0 H 0.82 L 0.8841 0.0004 L 0.9071 0.0015 L 0.9239 0.0035 L 0.9375 0.0062 L 0.9489 0.0098 L 0.9586 0.0142 L 0.967 0.0195 L 0.9743 0.0257 L 0.9805 0.033 L 0.9858 0.0414 L 0.9902 0.0511 L 0.9938 0.0625 L 0.9965 0.0761 L 0.9985 0.0929 L 0.9996 0.1159 L 1 0.18 V 0.82 L 0.9996 0.8841 L 0.9985 0.9071 L 0.9965 0.9239 L 0.9938 0.9375 L 0.9902 0.9489 L 0.9858 0.9586 L 0.9805 0.967 L 0.9743 0.9743 L 0.967 0.9805 L 0.9586 0.9858 L 0.9489 0.9902 L 0.9375 0.9938 L 0.9239 0.9965 L 0.9071 0.9985 L 0.8841 0.9996 L 0.82 1 H 0.18 L 0.1159 0.9996 L 0.0929 0.9985 L 0.0761 0.9965 L 0.0625 0.9938 L 0.0511 0.9902 L 0.0414 0.9858 L 0.033 0.9805 L 0.0257 0.9743 L 0.0195 0.967 L 0.0142 0.9586 L 0.0098 0.9489 L 0.0062 0.9375 L 0.0035 0.9239 L 0.0015 0.9071 L 0.0004 0.8841 L 0 0.82 V 0.18 L 0.0004 0.1159 L 0.0015 0.0929 L 0.0035 0.0761 L 0.0062 0.0625 L 0.0098 0.0511 L 0.0142 0.0414 L 0.0195 0.033 L 0.0257 0.0257 L 0.033 0.0195 L 0.0414 0.0142 L 0.0511 0.0098 L 0.0625 0.0062 L 0.0761 0.0035 L 0.0929 0.0015 L 0.1159 0.0004 L 0.18 0 Z" />
+        </clipPath>
+        <clipPath id="squircle-small-clip" clipPathUnits="objectBoundingBox">
+          <path d="M 1 0.5 L 0.9982 0.714 L 0.9928 0.7847 L 0.9838 0.8351 L 0.9709 0.8746 L 0.954 0.9066 L 0.9328 0.9328 L 0.9066 0.954 L 0.8746 0.9709 L 0.8351 0.9838 L 0.7847 0.9928 L 0.714 0.9982 L 0.5 1 L 0.286 0.9982 L 0.2153 0.9928 L 0.1649 0.9838 L 0.1254 0.9709 L 0.0934 0.954 L 0.0672 0.9328 L 0.046 0.9066 L 0.0291 0.8746 L 0.0162 0.8351 L 0.0072 0.7847 L 0.0018 0.714 L 0 0.5 L 0.0018 0.286 L 0.0072 0.2153 L 0.0162 0.1649 L 0.0291 0.1254 L 0.046 0.0934 L 0.0672 0.0672 L 0.0934 0.046 L 0.1254 0.0291 L 0.1649 0.0162 L 0.2153 0.0072 L 0.286 0.0018 L 0.5 0 L 0.714 0.0018 L 0.7847 0.0072 L 0.8351 0.0162 L 0.8746 0.0291 L 0.9066 0.046 L 0.9328 0.0672 L 0.954 0.0934 L 0.9709 0.1254 L 0.9838 0.1649 L 0.9928 0.2153 L 0.9982 0.286 Z" />
+        </clipPath>
+      </defs>
+    </svg>
+    <main class="viewport" aria-label="Scroll orbit prototype">
+      <section class="stage">
+        <div class="ambient-backdrop" aria-hidden="true">
+          <span class="ambient-layer is-active"></span>
+          <span class="ambient-layer"></span>
+        </div>
+
+        <nav class="mode-switch" aria-label="Mode switcher">
+          <button class="mode-button is-active" type="button" data-mode-target="play">Play</button>
+          <button class="mode-button" type="button" data-mode-target="create">Create</button>
+          <button class="mode-button" type="button" data-mode-target="edit">Edit</button>
+        </nav>
+
+        <div class="orbit-wrap" aria-label="Rotating image orbit">
+          <div class="orbit" aria-hidden="true"></div>
+          <p class="empty-orbit">record &amp; create your Orbit.</p>
+        </div>
+
+        <div class="album-info" aria-live="polite">
+          <p class="album-title"></p>
+          <p class="album-date"></p>
+        </div>
+
+        <img class="brand-logo" src="assets/orbit-logo.png" alt="Orbit" />
+
+        <section class="player-panel" aria-label="Orbit player">
+          <p class="now-playing">Not playing</p>
+          <div class="transport">
+            <button class="player-button" type="button" data-player-action="prev" aria-label="Previous">‹</button>
+            <button class="player-button play-toggle" type="button" data-player-action="toggle" aria-label="Play">▶</button>
+            <button class="player-button" type="button" data-player-action="next" aria-label="Next">›</button>
+          </div>
+          <div class="player-time">
+            <span class="current-time">0:00</span>
+            <input class="player-seek" type="range" min="0" max="30" value="0" step="0.01" aria-label="Playback progress" />
+            <span class="duration-time">0:30</span>
+          </div>
+        </section>
+
+        <section class="mode-panel create-panel" data-panel="create" aria-label="Create orbit item" aria-hidden="true">
+          <div class="panel-shell">
+            <div class="panel-head">
+              <p>Create</p>
+              <button class="close-button" type="button" data-mode-target="play" aria-label="Close create">×</button>
+            </div>
+            <div class="capture-stage">
+              <video class="camera-preview" autoplay playsinline muted></video>
+              <canvas class="capture-canvas" width="960" height="960" aria-hidden="true"></canvas>
+              <div class="captured-preview" aria-label="Captured image"></div>
+            </div>
+            <div class="capture-actions">
+              <button class="glass-button primary" type="button" data-create-action="capture" disabled>Capture Memory</button>
+            </div>
+            <label class="field">
+              <span>Title</span>
+              <input class="create-title" type="text" autocomplete="off" required placeholder="Landscape, voice, air..." />
+            </label>
+            <label class="field">
+              <span>Comment</span>
+              <textarea class="create-comment" rows="3" placeholder="A short note, optional"></textarea>
+            </label>
+            <p class="record-status">Camera and ambient audio are waiting.</p>
+            <button class="glass-button primary create-submit" type="button" disabled>Create Orbit Item</button>
+          </div>
+        </section>
+
+        <section class="mode-panel edit-panel" data-panel="edit" aria-label="Edit orbit items" aria-hidden="true">
+          <div class="panel-shell wide">
+            <div class="panel-head">
+              <p>Edit</p>
+              <div class="panel-actions">
+                <button class="quiet-button" type="button" data-mode-target="create">+ Add</button>
+                <button class="close-button" type="button" data-mode-target="play" aria-label="Close edit">×</button>
+              </div>
+            </div>
+            <div class="edit-list" aria-live="polite"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
