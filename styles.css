@@ -13,6 +13,8 @@ html,
 body {
   width: 100%;
   height: 100%;
+  min-height: 100%;
+  background: #050505;
 }
 
 body {
@@ -25,6 +27,19 @@ body {
     radial-gradient(circle at 78% 78%, rgba(94, 74, 62, 0.1), transparent 28%),
     linear-gradient(145deg, #171717 0%, #0d0e0f 58%, #050505 100%);
   font-family: Arial, Helvetica, sans-serif;
+  overscroll-behavior: none;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --stage-height: 100dvh;
+  }
+
+  html,
+  body,
+  .viewport {
+    height: 100dvh;
+  }
 }
 
 .squircle-defs {
@@ -36,11 +51,13 @@ body {
 
 .viewport {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   display: grid;
   width: 100vw;
   height: 100vh;
+  min-height: var(--stage-height);
+  overflow: hidden;
+  background: #050505;
   place-items: center;
 }
 
@@ -411,10 +428,12 @@ body {
   align-items: center;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
+  min-width: 0;
 }
 
 .player-seek {
   width: 100%;
+  min-width: 0;
   accent-color: rgba(255, 255, 255, 0.86);
   background: transparent;
   appearance: none;
@@ -774,6 +793,15 @@ body {
 
   body {
     min-width: 320px;
+    min-height: 100dvh;
+    background: #050505;
+  }
+
+  .viewport,
+  .stage {
+    width: 100vw;
+    height: 100dvh;
+    min-height: 100dvh;
   }
 
   .stage::after {
@@ -781,7 +809,7 @@ body {
   }
 
   .mode-switch {
-    top: max(14px, env(safe-area-inset-top));
+    top: calc(max(10px, env(safe-area-inset-top)) + 6px);
     left: 50%;
     right: auto;
     z-index: 1900;
@@ -818,7 +846,7 @@ body {
   .brand-logo {
     top: auto;
     left: 5.5vw;
-    bottom: calc(18vh + env(safe-area-inset-bottom));
+    bottom: calc(18dvh + max(18px, env(safe-area-inset-bottom)));
     width: var(--logo-width);
   }
 
@@ -842,12 +870,13 @@ body {
   }
 
   .player-panel {
-    right: 4vw;
-    bottom: max(14px, env(safe-area-inset-bottom));
-    left: 4vw;
+    right: max(14px, 4vw);
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + 10px);
+    left: max(14px, 4vw);
     grid-template-columns: 1fr;
     gap: 9px;
     padding: 12px;
+    max-width: calc(100vw - 28px);
     border-radius: 28px;
     corner-shape: squircle;
   }
@@ -873,20 +902,21 @@ body {
     grid-template-columns: 34px minmax(0, 1fr) 34px;
     gap: 9px;
     width: 100%;
+    min-width: 0;
   }
 
   .mode-panel {
     padding:
       max(68px, calc(env(safe-area-inset-top) + 56px))
       14px
-      max(18px, env(safe-area-inset-bottom));
+      calc(max(18px, env(safe-area-inset-bottom)) + 8px);
     place-items: start center;
   }
 
   .panel-shell,
   .panel-shell.wide {
     width: min(100%, 430px);
-    max-height: calc(100vh - 96px - env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 104px - env(safe-area-inset-bottom));
     padding: 18px;
     border-radius: 30px;
   }
