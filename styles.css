@@ -582,8 +582,12 @@ body {
   display: none;
 }
 
-.camera-preview {
+:root[data-camera-facing="user"] .camera-preview {
   transform: scaleX(-1);
+}
+
+.camera-switch {
+  display: none;
 }
 
 .captured-preview {
@@ -928,6 +932,11 @@ body {
   .capture-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .camera-switch {
+    display: block;
+    color: rgba(245, 245, 242, 0.86);
   }
 
   .glass-button {

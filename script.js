@@ -31,6 +31,7 @@ const createComment = document.querySelector(".create-comment");
 const createSubmit = document.querySelector(".create-submit");
 const recordStatus = document.querySelector(".record-status");
 const captureMemoryButton = document.querySelector("[data-create-action='capture']");
+const switchCameraButton = document.querySelector("[data-create-action='switch-camera']");
 
 const state = {
   mode: "play",
@@ -65,6 +66,7 @@ const state = {
     stream: null,
     recorder: null,
     chunks: [],
+    facingMode: "user",
   },
   edit: {
     selectedMonth: null,
@@ -919,15 +921,38 @@ function rgbToHsv(r, g, b) {
   return { r, g, b, h, s: max ? delta / max : 0, v: max };
 }
 
-async function startCamera() {
-  if (state.media.stream) {
+function isFrontCamera() {
+  return state.media.facingMode === "user";
+}
+
+function updateCameraUi() {
+  root.dataset.cameraFacing = state.media.facingMode;
+  if (switchCameraButton) {
+    switchCameraButton.textContent = isFrontCamera() ? "Front Camera" : "Rear Camera";
+    switchCameraButton.setAttribute("aria-label", isFrontCamera() ? "Switch to rear camera" : "Switch to front camera");
+  }
+}
+
+async function startCamera(options = {}) {
+  const force = options.force ?? false;
+  if (state.media.stream && !force) {
     captureMemoryButton.disabled = false;
     return;
   }
-  state.media.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  if (state.media.stream) stopCamera();
+  updateCameraUi();
+  try {
+    state.media.stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: state.media.facingMode } },
+      audio: true,
+    });
+  } catch (error) {
+    state.media.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  }
   cameraPreview.srcObject = state.media.stream;
   captureMemoryButton.disabled = false;
-  recordStatus.textContent = "Camera is live. Capture Memory records image and ambient audio.";
+  if (switchCameraButton) switchCameraButton.disabled = false;
+  recordStatus.textContent = `${isFrontCamera() ? "Front" : "Rear"} camera is live. Capture Memory records image and ambient audio.`;
 }
 
 function stopCamera() {
@@ -936,6 +961,23 @@ function stopCamera() {
   state.media.stream = null;
   cameraPreview.srcObject = null;
   captureMemoryButton.disabled = true;
+}
+
+async function switchCamera() {
+  if (switchCameraButton) switchCameraButton.disabled = true;
+  state.media.facingMode = isFrontCamera() ? "environment" : "user";
+  capturedPreview.classList.remove("has-image");
+  capturedPreview.style.backgroundImage = "";
+  state.createDraft = { image: null, audio: null, palette: null };
+  validateCreate();
+  try {
+    await startCamera({ force: true });
+  } catch {
+    state.media.facingMode = isFrontCamera() ? "environment" : "user";
+    updateCameraUi();
+    recordStatus.textContent = "Could not switch camera on this device.";
+    if (switchCameraButton) switchCameraButton.disabled = false;
+  }
 }
 
 function recordAmbient(duration = 2200) {
@@ -976,8 +1018,10 @@ async function captureMemory() {
   const sx = ((cameraPreview.videoWidth || 960) - size) / 2;
   const sy = ((cameraPreview.videoHeight || 960) - size) / 2;
   ctx.save();
-  ctx.translate(canvas.width, 0);
-  ctx.scale(-1, 1);
+  if (isFrontCamera()) {
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+  }
   ctx.drawImage(cameraPreview, sx, sy, size, size, 0, 0, canvas.width, canvas.height);
   ctx.restore();
   const image = canvas.toDataURL("image/jpeg", 0.9);
@@ -1149,6 +1193,12 @@ document.querySelector("[data-create-action='capture']").addEventListener("click
     captureMemoryButton.disabled = !state.media.stream;
   });
 });
+
+if (switchCameraButton) {
+  switchCameraButton.addEventListener("click", () => {
+    switchCamera();
+  });
+}
 
 createTitle.addEventListener("input", validateCreate);
 createSubmit.addEventListener("click", createItem);
