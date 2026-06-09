@@ -835,6 +835,7 @@ body {
     width: 112vw;
     height: min(72vw, 360px);
     perspective: 1200px;
+    touch-action: none;
   }
 
   .stage.is-orbit-hover .orbit-wrap {

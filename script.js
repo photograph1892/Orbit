@@ -32,6 +32,8 @@ const createSubmit = document.querySelector(".create-submit");
 const recordStatus = document.querySelector(".record-status");
 const captureMemoryButton = document.querySelector("[data-create-action='capture']");
 const switchCameraButton = document.querySelector("[data-create-action='switch-camera']");
+const finePointerQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
 
 const state = {
   mode: "play",
@@ -56,6 +58,15 @@ const state = {
   hoverAmount: 0,
   lastWheelStepAt: 0,
   snapTimer: null,
+  suppressNextClick: false,
+  touch: {
+    active: false,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    moved: false,
+  },
   ambientLayerIndex: 0,
   createDraft: {
     image: null,
@@ -390,7 +401,12 @@ function renderOrbit() {
     card.style.setProperty("--w", "clamp(150px, 8.6vw, 290px)");
     card.style.setProperty("--art", artForItem(item));
     card.appendChild(art);
-    card.addEventListener("click", () => {
+    card.addEventListener("click", (event) => {
+      if (state.suppressNextClick) {
+        event.preventDefault();
+        state.suppressNextClick = false;
+        return;
+      }
       if (state.orbitHover) playFocusedTrack();
       else playTrack(index);
     });
@@ -653,6 +669,7 @@ function setOrbitHover(active) {
 }
 
 function updateHoverFromPointer(event) {
+  if (!finePointerQuery.matches) return;
   if (state.mode !== "play" || !getOrbitItems().length) {
     setOrbitHover(false);
     return;
@@ -667,6 +684,70 @@ function updateHoverFromPointer(event) {
     ((localX - 0.5) / radiusX) ** 2 +
     ((localY - centerY) / radiusY) ** 2;
   setOrbitHover(ellipse <= 1);
+}
+
+function canHandlePlaySwipe(target) {
+  if (!coarsePointerQuery.matches) return false;
+  if (state.mode !== "play" || !getOrbitItems().length) return false;
+  if (!target || typeof target.closest !== "function") return true;
+  return !target.closest(
+    ".mode-nav, .mode-panel, .player-panel, .player-button, .player-seek, input, textarea, select",
+  );
+}
+
+function handleTouchStart(event) {
+  if (!canHandlePlaySwipe(event.target) || event.touches.length !== 1) {
+    state.touch.active = false;
+    return;
+  }
+  const touch = event.touches[0];
+  state.touch.active = true;
+  state.touch.startX = touch.clientX;
+  state.touch.startY = touch.clientY;
+  state.touch.lastX = touch.clientX;
+  state.touch.lastY = touch.clientY;
+  state.touch.moved = false;
+}
+
+function handleTouchMove(event) {
+  if (!state.touch.active || event.touches.length !== 1) return;
+  const touch = event.touches[0];
+  const deltaX = touch.clientX - state.touch.startX;
+  const deltaY = touch.clientY - state.touch.startY;
+  state.touch.lastX = touch.clientX;
+  state.touch.lastY = touch.clientY;
+  if (Math.hypot(deltaX, deltaY) > 10) {
+    state.touch.moved = true;
+    event.preventDefault();
+  }
+}
+
+function handleTouchEnd(event) {
+  if (!state.touch.active) return;
+  const deltaX = state.touch.lastX - state.touch.startX;
+  const deltaY = state.touch.lastY - state.touch.startY;
+  const absX = Math.abs(deltaX);
+  const absY = Math.abs(deltaY);
+  const swipeDistance = 42;
+
+  state.touch.active = false;
+  if (Math.max(absX, absY) < swipeDistance) return;
+
+  event.preventDefault();
+  state.suppressNextClick = true;
+  window.setTimeout(() => {
+    state.suppressNextClick = false;
+  }, 80);
+
+  if (absY > absX * 1.15) {
+    setOrbitHover(deltaY < 0);
+    return;
+  }
+
+  if (absX > absY * 1.15) {
+    navigateTrack(deltaX > 0 ? 1 : -1);
+    scheduleSnap(state.orbitHover ? 150 : 115);
+  }
 }
 
 function seekToIndex(index, immediate = false) {
@@ -1292,7 +1373,15 @@ window.addEventListener("wheel", (event) => {
 }, { passive: false });
 
 window.addEventListener("pointermove", updateHoverFromPointer);
-window.addEventListener("pointerleave", () => setOrbitHover(false));
+window.addEventListener("pointerleave", () => {
+  if (finePointerQuery.matches) setOrbitHover(false);
+});
+window.addEventListener("touchstart", handleTouchStart, { passive: true });
+window.addEventListener("touchmove", handleTouchMove, { passive: false });
+window.addEventListener("touchend", handleTouchEnd, { passive: false });
+window.addEventListener("touchcancel", () => {
+  state.touch.active = false;
+});
 window.addEventListener("keydown", handleKeyboard);
 
 async function initApp() {
