@@ -4,7 +4,7 @@ const DB_NAME = "orbit.archive.db";
 const DB_VERSION = 1;
 const DB_STORE = "items";
 const PLAY_DURATION = 30;
-const COMPACT_ORBIT_THRESHOLD = 24;
+const COMPACT_ORBIT_THRESHOLD = 25;
 const COMPACT_ORBIT_STEP = 14;
 
 const root = document.documentElement;
@@ -477,6 +477,16 @@ function playItemFromMonth(id) {
 function updateRotation() {
   const rotationEase = state.orbitHover || state.hoverAmount > 0.02 ? 0.105 : 0.135;
   const hoverEase = state.orbitHover ? 0.095 : 0.105;
+  const shouldAutoRotate =
+    state.mode === "play" &&
+    !state.orbitHover &&
+    !isFiniteOrbit() &&
+    getOrbitItems().length >= COMPACT_ORBIT_THRESHOLD;
+
+  if (shouldAutoRotate) {
+    state.rotation.autoRotation += state.isPlaying ? 0.045 : 0.018;
+  }
+
   state.rotation.userRotation += (state.rotation.targetUserRotation - state.rotation.userRotation) * rotationEase;
   if (Math.abs(state.rotation.targetUserRotation - state.rotation.userRotation) < 0.001) {
     state.rotation.userRotation = state.rotation.targetUserRotation;
