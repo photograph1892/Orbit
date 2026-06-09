@@ -850,10 +850,7 @@ body {
   }
 
   .brand-logo {
-    top: auto;
-    left: 5.5vw;
-    bottom: calc(18dvh + max(18px, env(safe-area-inset-bottom)));
-    width: var(--logo-width);
+    display: none;
   }
 
   .album-info {
@@ -867,12 +864,12 @@ body {
   }
 
   .album-title {
-    font-size: clamp(22px, 8vw, 34px);
+    font-size: clamp(18px, 6.2vw, 26px);
   }
 
   .album-date {
-    margin-top: 16px;
-    font-size: 14px;
+    margin-top: 10px;
+    font-size: 12px;
   }
 
   .player-panel {
