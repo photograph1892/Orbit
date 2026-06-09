@@ -592,6 +592,22 @@ function snapRotation(value) {
   return clampFinalRotation(Math.round(value / getCardStep()) * getCardStep());
 }
 
+function getTargetFinalRotation() {
+  return (
+    state.rotation.autoRotation +
+    state.rotation.targetUserRotation +
+    state.rotation.dragRotation
+  );
+}
+
+function getNearestFinalRotationForIndex(index) {
+  const targetIndex = clampTrackIndex(index);
+  const rawTarget = -targetIndex * getCardStep();
+  if (isFiniteOrbit()) return clampFinalRotation(rawTarget);
+  const currentTarget = getTargetFinalRotation();
+  return currentTarget + normalizeAngle(rawTarget - currentTarget);
+}
+
 function getFrontIndexFromRotation(value) {
   const orbitItems = getOrbitItems();
   if (!orbitItems.length) return 0;
@@ -654,8 +670,11 @@ function updateHoverFromPointer(event) {
 }
 
 function seekToIndex(index, immediate = false) {
-  const target = clampFinalRotation(-clampTrackIndex(index) * getCardStep());
-  state.rotation.targetUserRotation = target - state.rotation.autoRotation;
+  const target = getNearestFinalRotationForIndex(index);
+  state.rotation.targetUserRotation =
+    target -
+    state.rotation.autoRotation -
+    state.rotation.dragRotation;
   if (immediate) {
     state.rotation.userRotation = state.rotation.targetUserRotation;
   }
